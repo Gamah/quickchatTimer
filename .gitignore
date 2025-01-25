@@ -1,3 +1,8 @@
+.vs/
+build/
+plugins/
+quickchatTimer/IMGUI/
+
 # Prerequisites
 *.d
 
