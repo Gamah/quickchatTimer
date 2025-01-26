@@ -9,61 +9,61 @@ std::shared_ptr<CVarManagerWrapper> _globalCvarManager;
 
 
 void quickchatTimer::Render(CanvasWrapper canvas) {
-	
-	auto now = std::chrono::system_clock::now();
-	auto duration = now.time_since_epoch();
-	auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+    auto now = std::chrono::system_clock::now();
+    auto duration = now.time_since_epoch();
+    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 
+    SettingsWrapper x;
+    VideoSettings y = x.GetVideoSettings();
 
-	SettingsWrapper x;
-	VideoSettings y = x.GetVideoSettings();
+    std::string z = y.Resolution;
 
-	std::string z = y.Resolution;
+    float width, height;
 
-	float width, height;
+    std::stringstream ss(z);
+    std::string token;
 
-	std::stringstream ss(z);
-	std::string token;
+    // Get the width
+    std::getline(ss, token, 'x');
+    width = std::stof(token);
 
-	// Get the width 
-	std::getline(ss, token, 'x');
-	width = std::stof(token);
+    // Get the height
+    std::getline(ss, token);
+    height = std::stof(token);
 
-	// Get the height
-	std::getline(ss, token);
-	height = std::stof(token);
+    height = height * 0.395;
 
-	
-	height = height * 0.395;
+    int out = milliseconds - start;
+    int qctime = 1750;
 
-	int out = milliseconds - start;
-	int qctime = 1750;
+    if (out > qctime || qctime - out > qctime) {
+        out = 0;
+    }
 
-	if (out > qctime || qctime - out > qctime) {
-		out = 0;
-	}
-	float barstart = width * 0.014; //figure this out later
-	float barstop = width * 0.18 ; 
-	float progress = (float)out / (float)qctime;
-	float barend = barstart + (((float)out / (float)qctime ) * barstop);
+    float barstart = width * 0.014; // Left edge of the bar
+    float barstop = width * 0.18;  // Initial right edge of the bar
+    float progress = (float)out / (float)qctime;
 
+    // Calculate the shrinking bar's current right edge
+    float barend = barstop - (progress * (barstop - barstart));
 
-	// defines colors in RGBA 0-255
-	LinearColor colors;
-	colors.R = 0;
-	colors.G = 255;
-	colors.B = 0;
-	colors.A = 128;
-	canvas.SetColor(colors);
-	 
-	
+    // Defines colors in RGBA 0-255
+    LinearColor colors;
+    colors.R = 0;
+    colors.G = 255;
+    colors.B = 0;
+    colors.A = 128;
+    canvas.SetColor(colors);
 
-	if (progress != 0) {
-		colors.R = progress * 255;
-		colors.G = (1.0 - progress) * 255;
-		canvas.SetColor(colors);		
-		canvas.DrawRect(Vector2F{ barstart,height }, Vector2F{ barend,height + (float(height * 0.55))});
-	}
+    if (progress != 0) {
+        colors.R = progress * 255;
+        colors.G = (1.0 - progress) * 255;
+        canvas.SetColor(colors);
+
+        // Draw the rectangle shrinking from right to left
+        canvas.DrawRect(Vector2F{ barstart, height }, Vector2F{ barend, height + (float(height * 0.55)) });
+    }
+
 
 	//debug
 	/*
